@@ -547,12 +547,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
+			// 准备工作，做一些环境变量的验证
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 给子类的 beanFactory 设置序列化 id 等，并返回
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+
+			// 配置 beanFactory 的一些标准上下文特征，比如上下文的类加载器，后置处理器 post-processors(一个list) 等
+			// 注册 environment、systemProperties 等类的单例对象到 beanFactory 的 manualSingletonNames，以及 beanFactory 相关父类的相关 map
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -631,10 +635,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 空方法
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+
+
+		// 检查必须的 properties 是否设置，不设置则报 MissingRequiredPropertiesException
+		// 创建 AbstractApplicationContext 的子类并覆写 initPropertySources，在该方法中调用 getEnvironment().setRequiredProperties("XXX")
+		// 在启动时如果没有设置 XXX 环境变量则会报错
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
