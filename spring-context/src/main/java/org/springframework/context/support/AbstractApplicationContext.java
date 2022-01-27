@@ -542,29 +542,35 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	@Override
+	// 刷新 spring 的上下文
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			// 准备工作，做一些环境变量的验证
+			// 刷新前的准备工作，做一些环境变量的验证
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
 			// 给子类的 beanFactory 设置序列化 id 等，并返回
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-
+			// beanFactory 的准备工作
 			// 配置 beanFactory 的一些标准上下文特征，比如上下文的类加载器，后置处理器 post-processors(一个list) 等
 			// 注册 environment、systemProperties 等类的单例对象到 beanFactory 的 manualSingletonNames，以及 beanFactory 相关父类的相关 map
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// beanFactory 准备工作完成的后处理工作
+				// 空方法，如果子类覆写了该方法则执行该方法
+				// 可以在 beanFactory 初始化后，beanDefinition 创建之前做一些事情
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+
 				// Invoke factory processors registered as beans in the context.
+
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
